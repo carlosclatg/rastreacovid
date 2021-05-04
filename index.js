@@ -17,7 +17,6 @@ const http = require('http')
 var fs = require('fs');
 //const DB_URL = "mongodb+srv://carlos:250894@cluster0.v8se2.mongodb.net/ioc?retryWrites=true&w=majority"
 const JWT_SECRET = "MYSECRET"
-const 
 
 const { registerUser, 
     authenticateUser, 
