@@ -1,0 +1,583 @@
+openapi: 3.0.0
+info:
+  version: 1.0.1
+  title: RastreaCovid
+  x-summary: This API performs CRUD operations
+  description: >
+    API CRUD on objects. 
+
+      This is the general API interface for RastreaCovid
+
+      All timestamp field **are** UTC based !
+
+      The DB has the following fields
+servers:
+  - description: Nodejs
+    url: >-
+      localhost:8080/api
+
+tags:
+  - name: Features
+
+paths:
+  '/user':
+    post:
+      x-auth-type: Application User
+      summary: Register one new user.
+      description: |
+         Use this resource to register a new user.
+      operationId: postFeature
+      tags:
+        - Features
+      requestBody:
+        description: Here you can add all the attributes to register the user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+      responses:
+        '200':
+          description: internal id registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UriRef'
+        '400':
+          description: If any of the elements is not present, null or empty string. If a email or phone is already registered.
+  '/user/auth':
+    post:
+      x-auth-type: Application User
+      summary: Register one new user.
+      description: |
+         Use this resource to authenticate
+      operationId: Auth
+      tags:
+        - Features
+      requestBody:
+        description: Authentication by email and password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthUser'
+      responses:
+        '200':
+          description: internal id registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '400':
+          description: If any of the elements is not present, null or empty string.
+  '/user/update':
+    put:
+      x-auth-type: Application User
+      summary: Updates user attributes by email
+      description: |
+         Use this resource to update a user
+      operationId: putFeature
+      tags:
+        - Features
+      requestBody:
+        description: Updates user attributes by email
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+      responses:
+        '200':
+          description: internal id registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UriRef'
+        '400':
+          description: If any of the elements is not present, null or empty string.
+  '/retrieveuser':
+    get:
+      x-auth-type: Application User
+      summary: Retrieve data from a user
+      description: |
+         Use this resource to retrieve data from a user
+      operationId: Retrieve Feature
+      security:
+        - bearerAuth: []
+      tags:
+        - Features
+      responses:
+        '200':
+          description: User attributes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveUser'
+        '400':
+          description: If auth by token fails
+  '/sintoms/{lang}':
+    get:
+      x-auth-type: Application User
+      summary: Retrieve list of sintoms 
+      description: |
+         Use this resource to retrieve sintoms. It contains the id of the sintom and translate in catalan (cat), spanish(es) and english (eng).
+      operationId: Retrieve sintoms
+      parameters:
+        - in: path
+          name: lang 
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      tags:
+        - Features
+      responses:
+        '200':
+          description: User attributes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RetrieveSintoms'
+        '400':
+          description: If auth by token fails
+  '/pacient':
+    post:
+      x-auth-type: Application User
+      summary: Create a pacient
+      description: |
+         Use this resource to create a pacient.
+      operationId: toostpacien
+      security:
+        - bearerAuth: []
+      tags:
+        - Features
+      requestBody:
+        description: birthDate and PCRDate are expressed as integer UnixTimeStamp in milliseconds. In case no sintom or contact is reported, it should be indicated as empty array [].
+        required: true
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/CreatePacient'
+      responses:
+        '200':
+          description: internal id registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UriRef'
+        '400':
+          description: If any of the sintoms is not present, or anyother element is null or empty string.
+  '/pacients':
+    get:
+      x-auth-type: Application User
+      summary: Retrieve pacients
+      description: |
+         Use this resource to get all pacients.
+      operationId: getPacients
+      security:
+        - bearerAuth: []
+      tags:
+        - Features
+      responses:
+        '200':
+          description: Array of pacients. No details over sintoms and contacts only PK of them.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RetrievePacients'
+        '400':
+          description: If any of the sintoms is not present, or anyother element is null or empty string.
+  '/pacient/{pacientid}?lang':
+    get:
+      x-auth-type: Application User
+      summary: get detail of a pacient given a patientid
+      description: |
+         Use this resource to get all pacients.
+      operationId: getPacients
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: patientid  
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: lang  
+          required: false
+          schema:
+            type: string
+            default: cat
+      tags:
+        - Features
+      responses:
+        '200':
+          description: Pacient details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RetrieveOnePacient'
+        '400':
+          description: If any of the sintoms is not present, or anyother element is null or empty string.
+  '/contacts/{pacientid}':
+    get:
+      x-auth-type: Application User
+      summary: get detail of a contacts for a given patientid
+      description: |
+         Use this resource to get all pacients.
+      operationId: getContacts
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: patientid  
+          required: true
+          schema:
+            type: string
+      tags:
+        - Features
+      responses:
+        '200':
+          description: Array of pacients. No details over sintoms and contacts only PK of them.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContactsSchema'
+        '400':
+          description: If the query is not build or element not present.
+  '/pacient/{pacientid}':
+    delete:
+      x-auth-type: Application User
+      summary: delete pacient and its contacts
+      description: |
+         Use this resource to delete a pacient and its contacts
+      operationId: getContacts
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: patientid  
+          required: true
+          schema:
+            type: string
+      tags:
+        - Features
+      responses:
+        '200':
+          description: response ok
+          content:
+            application/json:
+              schema:
+                type: string
+                example: ok
+        '400':
+          description: If the patientid does not exist
+components:
+  schemas:
+    UriRef:
+      type: object
+      description: Reference to the object
+      required: 
+        - _id
+      properties:
+        unique_id:
+          type: string
+      example:
+        _id: "507f1f77bcf86cd799439011"
+    Token:
+      type: object
+      description: Token, expires in 4h.
+      required: 
+        - _id
+        - type
+      properties:
+        token:
+          type: string
+          format: uri
+        type:
+          type: string
+      example:
+        token: "Your_auth_token"
+        type: "admin"
+    RegisterUser:
+      type: object
+      description: User to be added
+      required:
+        - name
+        - surname
+        - password
+        - passwordConfirm
+        - email
+        - type
+        - phone
+      properties:
+        name:
+          type: string
+          description: name
+        surname:
+          type: string
+          description: surname
+        password:
+          type: string
+          description: Password, must have a minimum requirements.
+        passwordConfirm:
+          type: string
+          description: Password, must have a minimum requirements. Intended for password confirmation check.
+        email:
+          type: string
+          description: email of the user. Unique in DB.
+        type:
+          type: string
+          description: type of user. Values accepted are rastreator and admin.
+        phone:
+          type: number
+          description: Phone number of the user. Unique in DB.
+      example:
+        name: "IOC User"
+        surname: "IOC surname"
+        password: "UserIOC1234!"
+        passwordConfirm: "UserIOC1234!"
+        email: "opc@ioc.com"
+        type: "rastreator"
+        phone: "123456909"
+    AuthUser:
+      type: object
+      description: User to be authenticated
+      required:
+        - password
+        - email
+      properties:
+        password:
+          type: string
+          description: Password, must have a minimum requirements.
+        email:
+          type: string
+          description: email of the user. Unique in DB.
+      example:
+        password: "UserIOC1234!"
+        email: "opc@ioc.com"
+    RetrieveUser:
+      type: object
+      description: Retrieved info from user
+      required:
+        - name
+        - surname
+        - email
+        - phone
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+      example:
+        name: "IOC User"
+        surname: "IOC surname"
+        email: "opc@ioc.com"
+        phone: "123456909"
+    RetrieveSintoms:
+      type: array
+      description: Retrieved info from user
+      required:
+        - id
+        - sintoms_cat
+        - sintoms_eng
+        - sintoms_es
+      properties:
+        id:
+          type: string
+        sintoma_cat:
+          type: string
+        sintoma_eng:
+          type: string
+        sintoma_es:
+          type: string
+      example:
+        id: "123456"
+        sintoma_es: "fiebre"
+        sintoma_eng: "fever"
+        sintoma_cat: "febre"
+    CreatePacient:
+      type: object
+      description: Retrieved info from user
+      required:
+        - name
+        - surname
+        - phone
+        - birthdate
+        - PCRDate
+        - contacts
+        - sintoms
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: integer
+        birthdate:
+          type: integer
+        PCRDate:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactsSchema'
+        sintoms:
+          type: array
+          items:
+            $ref: '#/components/schemas/SintomId'        
+      example:
+        name: "John"
+        surname: "Doe"
+        phone: 123456789
+        birthdate: 1234565598650000
+        PCRDate: 1234565598650000
+        contacts: [{"name": "Carlos1", "surname": "Calvo1", "phone": 123456789}, {"name": "Carlos1", "surname": "Calvo1", "phone": 123456777}]
+        sintoms: ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+    RetrievePacients:
+      type: array
+      description: Retrieved info from pacients
+      required:
+        - name
+        - surname
+        - phone
+        - birthdate
+        - PCRDate
+        - contacts
+        - sintoms
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: integer
+        birthdate:
+          type: integer
+        PCRDate:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactId'
+        sintoms:
+          type: array
+          items:
+            $ref: '#/components/schemas/SintomId'        
+      example:
+        name: "John"
+        surname: "Doe"
+        phone: 123456789
+        birthdate: 1234565598650000
+        PCRDate: 1234565598650000
+        contacts: ["60684b90c609df2b79a88666", "60684ba4c609df2b79a8888"]
+        sintoms: ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]  
+    SintomId:
+      type: object
+      description: id of the sintom
+      required:
+        - id
+      properties:
+        id:
+          type: string      
+      example:
+        id: "123456abcdef123456789"
+    ContactId:
+      type: object
+      description: id of the sintom
+      required:
+        - id
+      properties:
+        id:
+          type: string      
+      example:
+        id: "123456abcdef123456789"
+    ContactsSchema:
+      type: object
+      description: Contact info
+      required:
+        - name
+        - surname
+        - phone
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: integer  
+      example:
+        name: "John"
+        surname: "Doe"
+        phone: 345678909
+    SintomExtended:
+      type: object
+      description: Sintom Info. Depending on lang selected field sintoma_*** may change.
+      required:
+        - _id
+        - sintoma_cat
+      properties:
+        name:
+          type: string
+        sintoma_cat:
+          type: string
+      example:
+        _id: "123456abcdef"
+        sintoma_cat: "febre"
+    RetrieveOnePacient:
+      type: object
+      description: Retrieved detail info from user
+      required:
+        - name
+        - surname
+        - phone
+        - birthdate
+        - PCRDate
+        - contacts
+        - sintoms
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: integer
+        birthdate:
+          type: integer
+        PCRDate:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactsSchema'
+        sintoms:
+          type: array
+          items:
+            $ref: '#/components/schemas/SintomExtended'        
+      example:
+        name: "John"
+        surname: "Doe"
+        phone: 123456789
+        birthdate: 1234565598650000
+        PCRDate: 1234565598650000
+        contacts: [{"name": "Carlos1", "surname": "Calvo1", "phone": 123456789}, {"name": "Carlos1", "surname": "Calvo1", "phone": 123456777}]
+        sintoms: [{"_id":"123456abcdef", "sintoma_cat": "febre"} ]        
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
