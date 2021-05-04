@@ -17,7 +17,7 @@ const http = require('http')
 var fs = require('fs');
 const DB_URL = "mongodb+srv://carlos:250894@cluster0.v8se2.mongodb.net/ioc?retryWrites=true&w=majority"
 const JWT_SECRET = "MYSECRET"
-const PORT = 8080
+const 
 
 const { registerUser, 
     authenticateUser, 
@@ -43,7 +43,7 @@ const { registerUser,
  const updatePacient = 'updatePacient'
  const stats = 'getStats'
 
-mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
     .then(() => {
         tokenHelper.jwtSecret = JWT_SECRET //Initialize key for token
         const app = express() //Express server
@@ -95,7 +95,7 @@ mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
 
 
         var server =  http.createServer(app)
-        server.listen(PORT, ()=> console.log("http listening on port " + PORT))
+        server.listen(process.env.EXPOSE_PORT || 8080, ()=> console.log("http listening on port " + process.env.EXPOSE_PORT))
         //var server = https.createServer(options, app);
         //server.listen(PORT, ()=> console.log("https listening on port " + PORT))
     })
