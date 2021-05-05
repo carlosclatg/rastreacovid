@@ -415,7 +415,6 @@ const logic = {
                     throw new Error('No pacient was saved')
                 }
 
-                console.log(pacient)
                 
                 //delete previous pacients in case it has
                 if(existingPacient.contacts && existingPacient.contacts.length){
@@ -531,6 +530,15 @@ const logic = {
     retrieveAll(){
         return (async () => {
             return User.find({}).select("-password -__v");
+        })();
+    },
+
+    deleteUser(userId){        
+        if(!userId) throw new Error('userId must not be null')
+        return (async () => {
+                const deleteUser = await User.deleteOne({_id: userId})
+                if(deleteUser.deletedCount) return 'ok'             
+                return 'No user with id' + userId
         })();
     }
 }

@@ -15,7 +15,7 @@ const swaggerDocument = YAML.load('./swagger.yaml');
 const https = require('https')
 const http = require('http')
 var fs = require('fs');
-//const DB_URL = "mongodb+srv://carlos:250894@cluster0.v8se2.mongodb.net/ioc?retryWrites=true&w=majority"
+const DB_URL = "mongodb+srv://carlos:250894@cluster0.v8se2.mongodb.net/ioc?retryWrites=true&w=majority"
 const JWT_SECRET = "MYSECRET"
 
 const { registerUser, 
@@ -31,7 +31,8 @@ const { registerUser,
     updatePacientById,
     getStats,
     getFrequencySintoms,
-    retrieveAllUsers
+    retrieveAllUsers,
+    deleteUser
  } = require('./routes')
 
  const getContacts = 'getContacts'
@@ -41,9 +42,10 @@ const { registerUser,
  const deletePacient = 'deletePacient'
  const updatePacient = 'updatePacient'
  const stats = 'getStats'
+ const delUser = 'deleteUser'
 
-//mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
+mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
+//mongoose.connect(process.env.DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
     .then(() => {
         tokenHelper.jwtSecret = JWT_SECRET //Initialize key for token
         const app = express() //Express server
@@ -76,6 +78,7 @@ mongoose.connect(process.env.DB_URL, { useNewUrlParser: true,  useFindAndModify:
         router.put('/user/update', jsonBodyParser, updateUser)
         router.get('/retrieveuser', [tokenVerifierMiddleware], retrieveUser)
         router.get('/users', [jsonBodyParser, tokenVerifierMiddleware], retrieveAllUsers )
+        router.delete('/user/:userid',[jsonBodyParser,tokenVerifierMiddleware, logsMiddleware(delUser)], deleteUser )
 
         //pacients and contacts
         router.post('/pacient', [jsonBodyParser, tokenVerifierMiddleware, logsMiddleware(createPacient), verifyAuth(createPacient)], addPacient)

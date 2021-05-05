@@ -3,6 +3,7 @@ const { Logs } = require("../../../data")
 module.exports = function logsMiddleware(operation) {
     return (req, res, next)  => {
         userId = req.userId
+        console.log('This is ' + userId)
         try{
             Logs.create({userId, operation})
                 .then(x=> x)
