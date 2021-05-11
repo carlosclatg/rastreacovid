@@ -6,9 +6,13 @@ const {ADMIN, RASTREATOR} = require('../../../logic')
 module.exports = function verifyAuth(operation) {
     return async (req, res, next) => {
         try{
+            
             userId = req.userId
             const user = await User.findById(userId)
-            if(!user) res.status(408)
+            if(!user){
+                res.status(408); 
+                throw new Error('Auth failed');
+            } 
             const permissions = await Permissions.findOne({operation})
 
             console.log(permissions)

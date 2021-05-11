@@ -286,7 +286,7 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
-          name: patientid  
+          name: pacientid  
           required: true
           schema:
             type: string
@@ -302,16 +302,16 @@ paths:
                 example: ok
         '400':
           description: If the patientid does not exist
-  '/pacient/pacientid':
+  '/pacient/{pid}':
     put:
       x-auth-type: Application User
-      summary: Update a pacient
+      summary: Update a pacient by pacientid
       description: 
          Use this resource to update a pacient
       operationId: putFeature
       parameters:
         - in: path
-          name: pacientid  
+          name: pid  
           required: true
           schema:
             type: string
