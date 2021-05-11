@@ -393,7 +393,7 @@ const logic = {
                 //check existing phone
                 const existingPacient = await Pacient.findOne({'_id': pacientid});
                 if(!existingPacient){
-                    throw new Error('Existing phone')
+                    throw new Error('Non Existing phone')
                 } 
 
                 //update pacient

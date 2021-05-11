@@ -45,6 +45,26 @@ paths:
                 $ref: '#/components/schemas/UriRef'
         '400':
           description: If any of the elements is not present, null or empty string. If a email or phone is already registered.
+  '/users':
+    get:
+      x-auth-type: Application User
+      summary: get all users from app
+      description: |
+         Use this resource to get all users.
+      operationId: postFeature
+      tags:
+        - Features
+      responses:
+        '200':
+          description: internal id registered
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUsers'
+        '400':
+          description: If any of the elements is not present, null or empty string. If a email or phone is already registered.
   '/user/auth':
     post:
       x-auth-type: Application User
@@ -282,6 +302,112 @@ paths:
                 example: ok
         '400':
           description: If the patientid does not exist
+  '/pacient/pacientid':
+    put:
+      x-auth-type: Application User
+      summary: Update a pacient
+      description: 
+         Use this resource to update a pacient
+      operationId: putFeature
+      parameters:
+        - in: path
+          name: pacientid  
+          required: true
+          schema:
+            type: string
+      tags:
+        - Features
+      requestBody:
+        description: Updates pacient and contacts from a pacient. Deletes all pacients and add new ones.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePacient'
+      responses:
+        '200':
+          description: internal id registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UriRef'
+        '400':
+          description: The pacientid does not exist. If any of the elements is not present, null or empty string.
+  '/user/{userid}':
+    delete:
+      x-auth-type: Application User
+      summary: delete user
+      description: |
+         Use this resource to delete a user
+      operationId: deleteuser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userid  
+          required: true
+          schema:
+            type: string
+      tags:
+        - Features
+      responses:
+        '200':
+          description: response ok
+          content:
+            application/json:
+              schema:
+                type: string
+                example: ok
+        '400':
+          description: If the patientid does not exist
+  '/stats':
+    get:
+      x-auth-type: Application User
+      summary: get stats
+      description: |
+         Use this resource to get general statistics from the DB
+      operationId: stats
+      tags:
+        - Features
+      responses:
+        '200':
+          description: stats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeneralStats'
+        '400':
+          description: If aith fails.
+  '/stats-freq-sin/{lang}':
+    get:
+      x-auth-type: Application User
+      summary: Retrieve frequency stats from DB
+      description: |
+         Use this resource to sintoms stats
+      operationId: Retrieve sintoms stats
+      parameters:
+        - in: path
+          name: lang 
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      tags:
+        - Features
+      responses:
+        '200':
+          description: User attributes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsFreq'
+        '400':
+          description: If auth by token fails
 components:
   schemas:
     UriRef:
@@ -417,7 +543,7 @@ components:
         - name
         - surname
         - phone
-        - birthdate
+        - birthDate
         - PCRDate
         - contacts
         - sintoms
@@ -428,7 +554,7 @@ components:
           type: string
         phone:
           type: integer
-        birthdate:
+        birthDate:
           type: integer
         PCRDate:
           type: integer
@@ -444,7 +570,7 @@ components:
         name: "John"
         surname: "Doe"
         phone: 123456789
-        birthdate: 1234565598650000
+        birthDate: 1234565598650000
         PCRDate: 1234565598650000
         contacts: [{"name": "Carlos1", "surname": "Calvo1", "phone": 123456789}, {"name": "Carlos1", "surname": "Calvo1", "phone": 123456777}]
         sintoms: ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
@@ -455,7 +581,7 @@ components:
         - name
         - surname
         - phone
-        - birthdate
+        - birthDate
         - PCRDate
         - contacts
         - sintoms
@@ -466,7 +592,7 @@ components:
           type: string
         phone:
           type: integer
-        birthdate:
+        birthDate:
           type: integer
         PCRDate:
           type: integer
@@ -482,7 +608,7 @@ components:
         name: "John"
         surname: "Doe"
         phone: 123456789
-        birthdate: 1234565598650000
+        birthDate: 1234565598650000
         PCRDate: 1234565598650000
         contacts: ["60684b90c609df2b79a88666", "60684ba4c609df2b79a8888"]
         sintoms: ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]  
@@ -545,7 +671,7 @@ components:
         - name
         - surname
         - phone
-        - birthdate
+        - birthDate
         - PCRDate
         - contacts
         - sintoms
@@ -556,7 +682,7 @@ components:
           type: string
         phone:
           type: integer
-        birthdate:
+        birthDate:
           type: integer
         PCRDate:
           type: integer
@@ -572,10 +698,68 @@ components:
         name: "John"
         surname: "Doe"
         phone: 123456789
-        birthdate: 1234565598650000
+        birthDate: 1234565598650000
         PCRDate: 1234565598650000
         contacts: [{"name": "Carlos1", "surname": "Calvo1", "phone": 123456789}, {"name": "Carlos1", "surname": "Calvo1", "phone": 123456777}]
-        sintoms: [{"_id":"123456abcdef", "sintoma_cat": "febre"} ]        
+        sintoms: [{"_id":"123456abcdef", "sintoma_cat": "febre"} ] 
+    GetUsers:
+      type: array
+      description: Retriev info from users
+      required:
+        - name
+        - surname
+        - phone
+        - _id
+        - email
+        - type
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: integer
+        _id:
+          type: string
+        email:
+          type: string
+        type:
+          type: string
+      example:
+        name: "John"
+        surname: "Doe"
+        phone: 123456789
+        email: "cccc@aaaa.com"
+        _id: "60590b4e0ac5c341780ea2f7"
+        type: "admin"
+    GeneralStats:
+      type: array
+      description: Retrieve general stats
+      required:
+        - nsintoms
+        - ncontacts
+      properties:
+        nsintoms:
+          type: integer
+        ncontacts:
+          type: integer
+      example:
+        nsintoms: 3
+        ncontacts: 2
+    StatsFreq:
+      type: array
+      description: Retriev sintoms freq stats
+      required:
+        - _id
+        - count
+      properties:
+        _id:
+          type: string
+        count:
+          type: integer
+      example:
+        _id: 'fiebre'
+        count: 8
   securitySchemes:
     bearerAuth:            
       type: http

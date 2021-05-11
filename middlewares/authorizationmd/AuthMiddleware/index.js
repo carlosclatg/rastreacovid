@@ -11,6 +11,7 @@ module.exports = function verifyAuth(operation) {
             if(!user) res.status(408)
             const permissions = await Permissions.findOne({operation})
 
+            console.log(permissions)
             if(!user.type)  {
                 res.status(500); 
                 throw new EmptyError()
@@ -31,6 +32,7 @@ module.exports = function verifyAuth(operation) {
             next()
 
         }catch(err){
+            console.log(err)
             if(err instanceof AuthError){
                 res.status(401).json({
                     error: "Not Authorized"
@@ -42,6 +44,10 @@ module.exports = function verifyAuth(operation) {
                     error: "Not existing user"
                 })
             }
+
+            res.status(500).json({
+                error: "Internal server error"
+            })
         }
     };
 };
