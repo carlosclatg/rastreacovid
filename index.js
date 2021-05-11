@@ -15,7 +15,7 @@ const swaggerDocument = YAML.load('./swagger.yaml');
 const https = require('https')
 const http = require('http')
 var fs = require('fs');
-const DB_URL = "mongodb+srv://carlos:250894@cluster0.v8se2.mongodb.net/ioc?retryWrites=true&w=majority"
+//const DB_URL = "mongodb+srv://carlos:250894@cluster0.v8se2.mongodb.net/ioc?retryWrites=true&w=majority"
 const JWT_SECRET = "MYSECRET"
 
 const { registerUser, 
@@ -44,8 +44,8 @@ const { registerUser,
  const stats = 'getStats'
  const delUser = 'deleteUser'
 
-mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
-//mongoose.connect(process.env.DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
+//mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
     .then(() => {
         tokenHelper.jwtSecret = JWT_SECRET //Initialize key for token
         const app = express() //Express server
@@ -77,8 +77,8 @@ mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
         router.post('/user/auth', jsonBodyParser, authenticateUser)
         router.put('/user/update', jsonBodyParser, updateUser)
         router.get('/retrieveuser', [tokenVerifierMiddleware], retrieveUser)
-        router.get('/users', [jsonBodyParser, tokenVerifierMiddleware], retrieveAllUsers )
-        router.delete('/user/:userid',[jsonBodyParser,tokenVerifierMiddleware, logsMiddleware(delUser)], deleteUser )
+        router.get('/users', [jsonBodyParser, tokenVerifierMiddleware], retrieveAllUsers )//4
+        router.delete('/user/:userid',[jsonBodyParser,tokenVerifierMiddleware, logsMiddleware(delUser)], deleteUser ) //4
 
         //pacients and contacts
         router.post('/pacient', [jsonBodyParser, tokenVerifierMiddleware, logsMiddleware(createPacient), verifyAuth(createPacient)], addPacient)
@@ -86,15 +86,15 @@ mongoose.connect(DB_URL, { useNewUrlParser: true,  useFindAndModify: false  })
         router.get('/pacient/:pacientid', [tokenVerifierMiddleware, logsMiddleware(getPacients), verifyAuth(getPacients)], getPacientDetail)
         router.get('/contacts/:pacientid', [tokenVerifierMiddleware, logsMiddleware(getContacts), verifyAuth(getContacts)], getContactsByPacientId )
         router.delete('/pacient/:pacientid', [tokenVerifierMiddleware, logsMiddleware(deletePacient), verifyAuth(deletePacient)], deletePacientById)
-        router.put('/pacient/:pacientid',[jsonBodyParser, tokenVerifierMiddleware, logsMiddleware(updatePacient), verifyAuth(updatePacient)], updatePacientById)
+        router.put('/pacient/:pacientid',[jsonBodyParser, tokenVerifierMiddleware, logsMiddleware(updatePacient), verifyAuth(updatePacient)], updatePacientById) //4
 
         //Sprint4 --> Editar una vez creado el pacient la lista de contactos (añadir y eliminar) y el propio paciente
         //sintoms eng, cat, es
         router.get('/sintoms/:lang', [jsonBodyParser, tokenVerifierMiddleware,logsMiddleware(getSintoms), verifyAuth(getSintoms)], retrieveSintoms)
 
 
-        router.get('/stats',[jsonBodyParser, tokenVerifierMiddleware,logsMiddleware(stats), verifyAuth(stats)], getStats)
-        router.get('/stats-freq-sin/:lang',[jsonBodyParser, tokenVerifierMiddleware,logsMiddleware(stats), verifyAuth(stats)], getFrequencySintoms)
+        router.get('/stats',[jsonBodyParser, tokenVerifierMiddleware, logsMiddleware(stats), verifyAuth(stats)], getStats)//4
+        router.get('/stats-freq-sin/:lang',[jsonBodyParser, tokenVerifierMiddleware,logsMiddleware(stats), verifyAuth(stats)], getFrequencySintoms)//4
 
 
         var server =  http.createServer(app)
