@@ -372,8 +372,7 @@ const logic = {
 
 
     updatePacient(pacientid, name, surname, phone, bdate, PcrDate, arrayOfContacts, sintoms, userId){
-        if (typeof pacientid !== 'string') throw new TypeError('pacientid  is not a string')
-        if (!pacientid.trim().length) throw new EmptyError('pacientid cannot be empty')
+        if (!pacientid) throw new EmptyError('pacientid cannot be empty')
         if (typeof name !== 'string') throw new TypeError('name  is not a string')
         if (!name.trim().length) throw new EmptyError('name cannot be empty')
         if (typeof surname !== 'string') throw new TypeError('surname is not a string')

@@ -23,7 +23,7 @@ describe('logic', () => {
         const passwordConfirm = password
         const type1 = "admin"
         const type2 = "rastreator"
-        const phone = 987655555
+        const phone = Math.floor(Math.random() * 1000000)
 
         it('should throw Error on empty name', () =>
             expect(() => {
@@ -249,7 +249,7 @@ describe('logic', () => {
         const passwordConfirm = password
         const type1 = "admin"
         const type2 = "rastreator"
-        const phone = 987655555
+        const phone = Math.floor(Math.random() * 1000000)
 
         it('should throw Error on empty name', () =>
             expect(() => {
@@ -741,6 +741,348 @@ describe('logic', () => {
             } catch(err) {
                 console.log(err)
                 expect(err).not.toBeDefined()
+            }
+            
+        })
+    })
+
+    describe('get users', async () => {
+
+    
+        it('should success on gettings users', async () => {
+
+            try {
+                const users = await logic.retrieveAll()
+                expect(users).toBeInstanceOf(Array)
+
+            } catch(err) {
+                expect(err).toBeUndefined()
+            }
+            
+        })
+
+    })
+
+
+    describe('delete users', async () => {
+
+    
+        it('should fail on delete a user', async () => {
+
+            try {
+                const users = await logic.deleteUser(null)
+                
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+
+        it('should fail on non correct id from a user', async () => {
+
+            try {
+                const users = await logic.deleteUser(null)
+                
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+
+            
+        it('should succeed on delete a user', async () => {
+            const name = `AnInventedName-${Math.random()}`
+            const surname = `AnInventedSurname-${Math.random()}`
+            const email = `iocTest-${Math.random()}@mail.com`
+            const password = `123-${Math.random()}Ab!`
+            const passwordConfirm = password
+            const type1 = "admin"
+            const type2 = "rastreator"
+            const phone = Math.floor(Math.random() * 1000000)
+            try {
+                const id = await logic.registerUser(name, surname, email, password, passwordConfirm, type1, phone)
+                expect(id).toBeDefined()
+                const users = await logic.deleteUser(id)
+                const nouser = await User.findByIdAndDelete(id)
+                expect(nouser).toBeNull()
+
+            } catch(err) {
+                expect(err).toBeUndefined()
+            }
+            
+        })
+    })
+
+
+    describe('getStats', async () => {
+
+    
+        it('should succeed on getting stats' , async () => {
+
+            try {
+                const data = await logic.getStats()
+                expect(data).toBeInstanceOf(Array)
+
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+    })
+
+
+    describe('getStats frequency sintoms', async () => {
+
+    
+        it('should succeed on getting stats' , async () => {
+
+            try {
+                const data = await logic.getFrequencySintoms()
+                expect(data).toBeInstanceOf(Array)
+                    
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+    })
+
+
+
+    describe('update pacient', () => {
+
+        it('should updated pacient', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [{"name": "Carlos1", "surname": "Calvo1", "phone": 123456789}, {"name": "Carlos1", "surname": "Calvo1", "phone": 123456777}],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+                const data2 = {   
+                    "name": "CarlosTEst2",
+                    "surname": "CalvoTest2",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200001,
+                    "PCRDate": 1617371436001,
+                    "contacts" : [{"name": "Carlos1", "surname": "Calvo1", "phone": 123456789}],
+                    "sintoms": ["60684b90c609df2b79a8879b" ]
+                }
+
+
+
+                const id = await logic.registerPacient(data.name, data.surname, data.phone, data.birthdate, data.PCRDate, data.contacts, data.sintoms, '6047ddcf22679e30ca031ff0')                
+                expect(id).toBeDefined()
+                const pacient = await logic.getPacientDetail(id)
+                expect(pacient.name).toBe(data.name)
+                expect(pacient.surname).toBe(data.surname)
+                expect(pacient.phone).toBe(data.phone)
+                expect(pacient.birthdate).toBeDefined()
+                expect(pacient.PCRDate).toBeDefined()
+                expect(pacient.contacts.length).toBe(data.contacts.length)
+                expect(pacient.sintoms.length).toBe(data.sintoms.length)
+
+                const id2 =  await logic.updatePacient(id,data2.name, data2.surname, data2.phone, data2.birthdate, data2.PCRDate, data2.contacts, data2.sintoms, '6047ddcf22679e30ca031ff0' )
+                
+                const pacientupdated = await Pacient.findById(id)
+                expect(pacientupdated.name).toBe(data2.name)
+                expect(pacientupdated.surname).toBe(data2.surname)
+                expect(pacientupdated.phone).toBe(data2.phone)
+                expect(pacientupdated.birthdate).toBeDefined()
+                expect(pacientupdated.PCRDate).toBeDefined()
+                expect(pacientupdated.contacts.length).toBe(data2.contacts.length)
+                expect(pacientupdated.sintoms.length).toBe(data2.sintoms.length)
+                const del = await logic.deletePacient(id)
+                expect(del).toBeDefined()
+            } catch(err) {
+                console.log(err)
+                expect(err).not.toBeDefined()
+            }
+            
+        })
+
+        it('should fail in empty name', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+                const id = await logic.registerPacient(data.name, data.surname, data.phone, data.birthdate, data.PCRDate, data.contacts, data.sintoms, '6047ddcf22679e30ca031ff0')                
+                expect(id).toBeDefined()
+                const pacient = await logic.getPacientDetail(id)
+                expect(pacient.name).toBe(data.name)
+                expect(pacient.surname).toBe(data.surname)
+                expect(pacient.phone).toBe(data.phone)
+                expect(pacient.birthdate).toBeDefined()
+                expect(pacient.PCRDate).toBeDefined()
+                expect(pacient.contacts.length).toBe(data.contacts.length)
+                expect(pacient.sintoms.length).toBe(data.sintoms.length)
+                const del = await logic.deletePacient(id)
+                expect(del).toBeDefined()
+
+
+                const id2 =  await logic.updatePacient(id,null, data2.surname, data2.phone, data2.birthdate, data2.PCRDate, data2.contacts, data2.sintoms, '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+        it('should fail in empty surname', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+
+
+                const id2 =  await logic.updatePacient('null',data2.name, undefined, data2.phone, data2.birthdate, data2.PCRDate, data2.contacts, data2.sintoms, '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+        it('should fail in empty phone', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+
+
+                const id2 =  await logic.updatePacient('null',data2.name, data2.surname, undefined, data2.birthdate, data2.PCRDate, data2.contacts, data2.sintoms, '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+
+        it('should fail in empty birthdate', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+
+
+                const id2 =  await logic.updatePacient('null',data2.name, data2.surname, data2.phone, null, data2.PCRDate, data2.contacts, data2.sintoms, '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+        it('should fail in empty PCRDATE', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+
+
+                const id2 =  await logic.updatePacient('null',data2.name, data2.surname, data2.phone, data2.birthdate, null, data2.contacts, data2.sintoms, '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+        it('should fail in non-array contacts', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+
+
+                const id2 =  await logic.updatePacient('null',data2.name, data2.surname, data2.phone, data2.birthdate, data2.PCRDate, 'data2.contacts', data2.sintoms, '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
+            }
+            
+        })
+
+
+        it('should fail in non-array sintoms', async () => {
+            
+            try {
+                const data = {   
+                    "name": "CarlosTEst",
+                    "surname": "CalvoTest",
+                    "phone": Math.floor(Math.random() * (10000000 - 0 + 1)) + 10000000,
+                    "birthdate": 954547200000,
+                    "PCRDate": 1617371436000,
+                    "contacts" : [],
+                    "sintoms": ["60684b90c609df2b79a8879b", "60684ba4c609df2b79a8879c" ]
+                }
+
+
+
+                const id2 =  await logic.updatePacient('null',data2.name, data2.surname, data2.phone, data2.birthdate, data2.PCRDate, data2.contacts, 'data2.sintoms', '6047ddcf22679e30ca031ff0' )
+
+            } catch(err) {
+                expect(err).toBeDefined()
             }
             
         })
